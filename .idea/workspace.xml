@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d1edc485-a5e3-422b-bdde-581c934a1d47" name="Default Changelist" comment="" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <list default="true" id="d1edc485-a5e3-422b-bdde-581c934a1d47" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Proj2_DrawingBoard/DrawingBoard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Proj2_DrawingBoard/DrawingBoard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,24 +22,48 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/webgl-fundamentals" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1U1D3rd6tQ81lsq6swYCSTI9XqQ" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
+  <component name="RunManager" selected="JavaScript Debug.DrawingBoard.html">
+    <configuration name="DrawRectangles.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/LearnWebGL/Proj1_DrawRectangles/DrawRectangles.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="DrawingBoard.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/LearnWebGL/Proj2_DrawingBoard/DrawingBoard.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="DrawRectangles.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$PROJECT_DIR$/Proj1_DrawRectangles/DrawRectangles.js" working-dir="$PROJECT_DIR$/Proj1_DrawRectangles">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
       <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
+        <item itemvalue="JavaScript Debug.DrawingBoard.html" />
+        <item itemvalue="JavaScript Debug.DrawRectangles.html" />
+        <item itemvalue="Node.js.DrawRectangles.js" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
       </list>
     </option>
   </component>
@@ -51,6 +80,11 @@
       <workItem from="1574515014948" duration="2539000" />
       <workItem from="1574520506688" duration="657000" />
       <workItem from="1574521178263" duration="10215000" />
+      <workItem from="1574564458568" duration="257000" />
+      <workItem from="1574565647681" duration="1394000" />
+      <workItem from="1574576332033" duration="10095000" />
+      <workItem from="1574778212539" duration="5244000" />
+      <workItem from="1574920961791" duration="24270000" />
     </task>
     <servers />
   </component>
@@ -69,5 +103,88 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/webgl-fundamentals" />
+    </ignored-roots>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="380" y="71" key="#Deployment" timestamp="1574963077976">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="380" y="71" key="#Deployment/0.0.1536.824@0.0.1536.824" timestamp="1574963077976" />
+    <state x="361" y="71" key="#Inspections" timestamp="1574948478583">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="361" y="71" key="#Inspections/0.0.1536.824@0.0.1536.824" timestamp="1574948478583" />
+    <state x="370" y="0" width="835" height="824" key="CommitChangelistDialog2" timestamp="1574963087766">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="370" y="0" width="835" height="824" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1574963087766" />
+    <state width="1515" height="164" key="GridCell.Tab.0.bottom" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.0.center" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.0.left" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.0.right" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.1.bottom" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.1.center" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.1.left" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.1.right" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.2.bottom" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.2.bottom/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.2.center" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.2.center/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.2.left" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.2.left/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.2.right" timestamp="1574949882345">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.2.right/0.0.1536.824@0.0.1536.824" timestamp="1574949882345" />
+    <state width="1515" height="164" key="GridCell.Tab.3.bottom" timestamp="1574949882346">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.3.bottom/0.0.1536.824@0.0.1536.824" timestamp="1574949882346" />
+    <state width="1515" height="164" key="GridCell.Tab.3.center" timestamp="1574949882346">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.3.center/0.0.1536.824@0.0.1536.824" timestamp="1574949882346" />
+    <state width="1515" height="164" key="GridCell.Tab.3.left" timestamp="1574949882346">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.3.left/0.0.1536.824@0.0.1536.824" timestamp="1574949882346" />
+    <state width="1515" height="164" key="GridCell.Tab.3.right" timestamp="1574949882346">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="164" key="GridCell.Tab.3.right/0.0.1536.824@0.0.1536.824" timestamp="1574949882346" />
   </component>
 </project>
