@@ -78,6 +78,8 @@ class Snake {
     speed;
     wayPoints;
     latestWayPointKey;
+    star;
+    spikes;
     constructor(head, body=[], speed, wayPoints) {
         this.head = head;
         this.body = body.slice();
@@ -105,6 +107,12 @@ class Snake {
     currentDir() {
         return this.head.getDir();
     }
+    setStar(star) {
+        this.star = star;
+    }
+    setSpikes(spikes) {
+        this.spikes = spikes;
+    }
 
     move(deltaTime) {
         //移动头部
@@ -119,10 +127,20 @@ class Snake {
             if(m3.distance( bodyList[i].getPos(), this.getPrevious(bodyList[i]).getPos() ) < bodyList[i].getSize()) {
                 continue;
             }
+            if(!this.wayPoints.has(targetKey)) {
+                continue;
+            }
             if(m3.distance(bodyList[i].getPos(), targetPos) < deltaTime * this.speed) {
                 bodyList[i].setTargetKey(targetKey + 1);
+                if(i === bodyList.length - 1) {
+                    this.wayPoints.delete(targetKey);
+                }
             }
-            let dir = m3.dir(bodyList[i].getPos(), this.wayPoints.get(targetKey));
+            console.log(this.latestWayPointKey);
+            if(!this.wayPoints.has(bodyList[i].getTargetKey())) {
+                continue;
+            }
+            let dir = m3.dir(bodyList[i].getPos(), this.wayPoints.get(bodyList[i].getTargetKey()));
             dir = m3.normalize(dir);
             moveTo(bodyList[i], dir, this.speed, deltaTime);
         }
@@ -133,6 +151,61 @@ class Snake {
     }
 
     grow() {
+        let bodyList = this.body;
+        let index = bodyList.length;
+        let initBody = {
+            position: [],
+            targetKey: bodyList[index-1].getTargetKey(),
+            size: Math.max(bodyList[index-1].getSize() * 0.95, 5),
+            color: bodyList[index-1].getColor(),
+        };
+        let dir = m3.dir(bodyList[index-2].getPos(), bodyList[index-1].getPos());
+        dir = m3.normalize(dir);
+        initBody.position = [bodyList[index-1].getPos()[0] + dir[0] * initBody.size,
+                            bodyList[index-1].getPos()[1] + dir[1] * initBody.size];
+        let newBody = new SnakeBody(initBody);
+        this.body.push(newBody);
+    }
 
+    getHeadPos() {
+        let offset = this.head.getSize() * 1.154;
+        let offsetPos = [offset * this.currentDir()[0], offset * this.currentDir()[1]];
+        return [this.currentPos()[0] + offsetPos[0], this.currentPos()[1] + offsetPos[1]];
+    }
+    detectStar() {
+        let headPos = this.getHeadPos();
+        return (m3.distance(headPos, this.star.starPosition) <= this.star.starSize * 2);
+    }
+    detectBody() {
+        let headPos = this.getHeadPos();
+        let detected = false;
+        this.body.forEach(function (eachBody) {
+            if(m3.distance(headPos, eachBody.getPos()) < eachBody.getSize()) {
+                detected = true;
+            }
+        });
+        return detected;
+    }
+    detectBorder(border) {
+        let pos = this.currentPos();
+        return pos[0] <= 0 || pos[0] >= border[0] || pos[1] <= 0 || pos[1] >= border[1];
+    }
+    detectSpikes() {
+        let headPos = this.getHeadPos();
+        let detected = false;
+        this.spikes.forEach(function (spike) {
+            if(m3.distance(headPos, spike.spikePosition) < spike.spikeMaxSize + 2.5) {
+                detected = true;
+            }
+        });
+        return detected;
+    }
+    collisionDetection(border) {
+        if(this.detectStar()) {
+            return 1;
+        }
+        else if(this.detectBorder(border) || this.detectBody() || this.detectSpikes()) {
+            return 0;
+        }
     }
 }
