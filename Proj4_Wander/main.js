@@ -13,26 +13,78 @@ function main() {
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
 
     let position_AL = gl.getAttribLocation(program, "a_position");
-    let color_AL = gl.getAttribLocation(program, "a_color");
+    let texcoord_AL = gl.getAttribLocation(program, "a_texcoord");
     let matrix_UL = gl.getUniformLocation(program, "u_matrix");
+    let texture_UL = gl.getUniformLocation(program, "u_texture");
+    gl.enableVertexAttribArray(position_AL);
+    gl.enableVertexAttribArray(texcoord_AL);
 
-    //迷宫数据
-    let wallLength = 100;
+    //迷宫属性
+    let blockLength = 100;
     let mazeSize = 21;
     let maze = createMaze(mazeSize);
 
+    //迷宫网格数据
     let positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, wallMesh(wallLength), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, blockMesh(blockLength), gl.STATIC_DRAW);
 
-    let colorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, wallColor(), gl.STATIC_DRAW);
+    //墙壁纹理坐标
+    let wallTexcoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, wallTexcoordBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, wallTexcoord(), gl.STATIC_DRAW);
+    //地面纹理坐标
+    let groundTexcoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, groundTexcoordBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, groundTexcoord(mazeSize), gl.STATIC_DRAW);
+
+    //墙壁纹理
+    let wall_texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, wall_texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA,
+                  gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 255, 255]));
+    let wall_image = new Image();
+    wall_image.src = "Resources/Brick_Diffuse.JPG";
+    wall_image.addEventListener("load", function () {
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, wall_texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, wall_image);
+
+        if (m3.isPowerOf2(wall_image.width) && m3.isPowerOf2(wall_image.height)) {
+            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
+        else {
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
+    });
+    //地面纹理
+    let ground_texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, ground_texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA,
+                  gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 255, 255]));
+    let ground_image = new Image();
+    ground_image.src = "Resources/Road_Diffuse.jpg";
+    ground_image.addEventListener("load", function () {
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, ground_texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, ground_image);
+
+        if (m3.isPowerOf2(ground_image.width) && m3.isPowerOf2(ground_image.height)) {
+            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+        }
+        else {
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
+    });
 
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
     //摄像机属性
     let camera = {
-        position: getBlockPos(mazeSize, wallLength, [2, 0]),
+        position: getBlockPos(mazeSize, blockLength, [2, 0]),
         rotation: [0, -90, 0],
         direction: [0, 0, -1],
         fieldOfView: m3.degToRad(60),
@@ -41,8 +93,8 @@ function main() {
         far: 5000,
         moveSpeed: 100,
         rotateSpeed: [1, 1],
-        maxUpDeg: 90,
-        maxDownDeg: -90,
+        maxUpDeg: 89,
+        maxDownDeg: -89,
     };
 
     //监听键盘和鼠标输入
@@ -115,12 +167,23 @@ function main() {
 
     //设置全屏并锁定鼠标指针
     let btn = document.getElementById("full-screen-button");
+    function lockPointer() {
+        gl.canvas.requestFullscreen = gl.canvas.requestFullscreen ||
+            gl.canvas.mozRequestFullscreen ||
+            gl.canvas.mozRequestFullScreen ||
+            gl.canvas.webkitRequestFullscreen;
+        gl.canvas.requestFullscreen();
+    }
     btn.addEventListener("click", lockPointer);
     function fullscreenChange() {
         gl.canvas.requestPointerLock = gl.canvas.requestPointerLock ||
             gl.canvas.mozRequestPointerLock ||
             gl.canvas.webkitRequestPointerLock;
         gl.canvas.requestPointerLock();
+        if (!document.fullscreenElement) {
+            gl.canvas.width = 800;
+            gl.canvas.height = 600;
+        }
         webglUtils.resizeCanvasToDisplaySize(gl.canvas);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
@@ -129,13 +192,6 @@ function main() {
         console.log("锁定指针时出错。");
     }
     document.addEventListener('pointerlockerror', pointerLockError, false);
-    function lockPointer() {
-        gl.canvas.requestFullscreen = gl.canvas.requestFullscreen ||
-            gl.canvas.mozRequestFullscreen ||
-            gl.canvas.mozRequestFullScreen ||
-            gl.canvas.webkitRequestFullscreen;
-        gl.canvas.requestFullscreen();
-    }
 
     let lastFrameTime = performance.now() * 0.001;
     requestAnimationFrame(drawScene);
@@ -152,24 +208,6 @@ function main() {
         gl.enable(gl.CULL_FACE);
         gl.enable(gl.DEPTH_TEST);
 
-        gl.enableVertexAttribArray(position_AL);
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        var size = 3;
-        var type = gl.FLOAT;
-        var normalize = false;
-        var stride = 0;
-        var offset = 0;
-        gl.vertexAttribPointer(position_AL, size, type, normalize, stride, offset);
-
-        gl.enableVertexAttribArray(color_AL);
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        var size = 3;
-        var type = gl.UNSIGNED_BYTE;
-        var normalize = true;
-        var stride = 0;
-        var offset = 0;
-        gl.vertexAttribPointer(color_AL, size, type, normalize, stride, offset);
-
         //摄像头漫游
         cameraMove(deltaTime);
         cameraRotate(deltaTime);
@@ -180,19 +218,33 @@ function main() {
         let viewMatrix = m4.inverse(cameraMatrix);
         let viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.vertexAttribPointer(position_AL, 3, gl.FLOAT, false, 0, 0);
         //绘制迷宫
+        //墙壁
+        gl.bindBuffer(gl.ARRAY_BUFFER, wallTexcoordBuffer);
+        gl.vertexAttribPointer(texcoord_AL, 2, gl.FLOAT, false, 0, 0);
         for (let i = 0; i < mazeSize; i++) {
             for (let j = 0; j < mazeSize; j++) {
                 if(!maze[i][j]) {
-                    let wallPos = getBlockPos(mazeSize, wallLength, [i, j]);
-
+                    let wallPos = getBlockPos(mazeSize, blockLength, [i, j]);
                     let matrix = m4.translate(viewProjectionMatrix, wallPos);
+
                     gl.uniformMatrix4fv(matrix_UL, false, matrix);
+                    gl.uniform1i(texture_UL, 0);
 
                     gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
                 }
             }
         }
+        //地面
+        gl.bindBuffer(gl.ARRAY_BUFFER, groundTexcoordBuffer);
+        gl.vertexAttribPointer(texcoord_AL, 2, gl.FLOAT, false, 0, 0);
+        let matrix = m4.translate(viewProjectionMatrix, [0, -blockLength, 0]);
+        matrix = m4.scale(matrix, [mazeSize, 1, mazeSize]);
+        gl.uniformMatrix4fv(matrix_UL, false, matrix);
+        gl.uniform1i(texture_UL, 1);
+        gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
 
         requestAnimationFrame(drawScene);
     }
@@ -225,7 +277,7 @@ function main() {
         let rot = camera.rotation;
         rot = m4.addVectors(rot, degOffset);
         // console.log("pre:" + rot);
-        rot[0] = clamp(rot[0], camera.maxDownDeg, camera.maxUpDeg);
+        rot[0] = m3.clamp(rot[0], camera.maxDownDeg, camera.maxUpDeg);
         rot[1] = rot[1] < 0 ? (rot[1] + 360) : rot[1];
         rot[1] %= 361;
         // console.log("post:" + rot);
@@ -242,8 +294,4 @@ function main() {
         camera.rotation = rot;
         camera.rotateSpeed = [0, 0];
     }
-}
-
-function clamp(value, min, max) {
-    return Math.max(Math.min(value, max), min);
 }

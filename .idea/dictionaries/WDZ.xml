@@ -2,6 +2,7 @@
   <dictionary name="WDZ">
     <words>
       <w>glsl</w>
+      <w>texcoord</w>
     </words>
   </dictionary>
 </component>

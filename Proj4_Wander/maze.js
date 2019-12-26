@@ -58,7 +58,7 @@ function getBlockPos(mazeSize, wallLength, index) {
     return [wallLength * indexOffset[0], 0, wallLength * indexOffset[1]];
 }
 
-function wallMesh(length) {
+function blockMesh(length) {
     let half = length / 2.0;
     return new Float32Array([
         //+z
@@ -70,28 +70,28 @@ function wallMesh(length) {
         half, half, half,
 
         //-z
+        half, -half, -half,
         -half, half, -half,
-        half, half, -half,
-        -half, -half, -half,
         half, half, -half,
         half, -half, -half,
         -half, -half, -half,
+        -half, half, -half,
 
         //+y
-        -half, half, half,
         half, half, -half,
-        -half, half, -half,
         -half, half, half,
         half, half, half,
         half, half, -half,
+        -half, half, -half,
+        -half, half, half,
 
         //-y
+        half, -half, half,
         -half, -half, -half,
-        half, -half, -half,
-        -half, -half, half,
         half, -half, -half,
         half, -half, half,
         -half, -half, half,
+        -half, -half, -half,
 
         //+x
         half, -half, half,
@@ -102,63 +102,115 @@ function wallMesh(length) {
         half, half, -half,
 
         //-x
+        -half, -half, -half,
         -half, half, half,
-        -half, half, -half,
-        -half, -half, half,
         -half, half, -half,
         -half, -half, -half,
         -half, -half, half,
+        -half, half, half,
     ]);
 }
 
-function wallColor() {
-    return new Uint8Array([
+function wallTexcoord() {
+    return new Float32Array([
         //+z
-        200, 70, 120,
-        200, 70, 120,
-        200, 70, 120,
-        200, 70, 120,
-        200, 70, 120,
-        200, 70, 120,
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
 
         //-z
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
-        80, 70, 200,
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
 
         //+y
-        160, 160, 220,
-        160, 160, 220,
-        160, 160, 220,
-        160, 160, 220,
-        160, 160, 220,
-        160, 160, 220,
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
 
         //-y
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
-        90, 130, 110,
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
 
         //+x
-        76, 210, 100,
-        76, 210, 100,
-        76, 210, 100,
-        76, 210, 100,
-        76, 210, 100,
-        76, 210, 100,
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
 
         //-x
-        200, 200, 70,
-        200, 200, 70,
-        200, 200, 70,
-        200, 200, 70,
-        200, 200, 70,
-        200, 200, 70,
+        0, 0,
+        1, 1,
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
+    ]);
+}
+
+function groundTexcoord(mazeSize) {
+    return new Float32Array([
+        //+z
+        0, 0,
+        mazeSize, 1,
+        0, 1,
+        0, 0,
+        mazeSize, 0,
+        mazeSize, 1,
+
+        //-z
+        0, 0,
+        mazeSize, 1,
+        0, 1,
+        0, 0,
+        mazeSize, 0,
+        mazeSize, 1,
+
+        //+y
+        0, 0,
+        mazeSize, mazeSize,
+        0, mazeSize,
+        0, 0,
+        mazeSize, 0,
+        mazeSize, mazeSize,
+
+        //-y
+        0, 0,
+        mazeSize, mazeSize,
+        0, mazeSize,
+        0, 0,
+        mazeSize, 0,
+        mazeSize, mazeSize,
+
+        //+x
+        0, 0,
+        mazeSize, 1,
+        0, 1,
+        0, 0,
+        mazeSize, 0,
+        mazeSize, 1,
+
+        //-x
+        0, 0,
+        mazeSize, 1,
+        0, 1,
+        0, 0,
+        mazeSize, 0,
+        mazeSize, 1,
     ]);
 }
