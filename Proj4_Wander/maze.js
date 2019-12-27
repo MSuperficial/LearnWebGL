@@ -78,20 +78,20 @@ function blockMesh(length) {
         -half, half, -half,
 
         //+y
-        half, half, -half,
         -half, half, half,
-        half, half, half,
         half, half, -half,
         -half, half, -half,
         -half, half, half,
+        half, half, half,
+        half, half, -half,
 
         //-y
-        half, -half, half,
         -half, -half, -half,
-        half, -half, -half,
         half, -half, half,
         -half, -half, half,
         -half, -half, -half,
+        half, -half, -half,
+        half, -half, half,
 
         //+x
         half, -half, half,
@@ -212,5 +212,109 @@ function groundTexcoord(mazeSize) {
         0, 0,
         mazeSize, 0,
         mazeSize, 1,
+    ]);
+}
+
+function blockNormal() {
+    return new Float32Array([
+        //+z
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+
+        //-z
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+
+        //+y
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+
+        //-y
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+
+        //+x
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+
+        //-x
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+    ]);
+}
+
+function blockTangent() {
+    return new Float32Array([
+        //+z
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+
+        //-z
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+
+        //+y
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+
+        //-y
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+
+        //+x
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+
+        //-x
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
     ]);
 }
