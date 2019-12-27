@@ -55,13 +55,19 @@
         precision mediump float;
 
         uniform sampler2D u_mainTex;
+
         uniform sampler2D u_bumpMap;
-        uniform vec3 u_ambient;
+        uniform float u_bumpScale;
+
+        uniform sampler2D u_specularMask;
+        uniform float u_specularScale;
+        uniform int u_hasMask;
+
         uniform vec3 u_lightDir;
         uniform vec3 u_lightColor;
+        uniform vec3 u_ambient;
         uniform vec3 u_specular;
         uniform float u_gloss;
-        uniform float u_bumpScale;
 
         varying vec2 v_texcoord;
         varying vec3 v_normal;
@@ -81,13 +87,21 @@
             vec3 worldNormal = v_Mat_TtoW * bump;
 
             vec3 albedo = texture2D(u_mainTex, v_texcoord).rgb;
+
             vec3 ambient = albedo * u_ambient;
-            //Lambert lighting
+
+            // Lambert lighting
             vec3 diffuse = u_lightColor * albedo * max(0.0, dot(worldNormal, lightDir));
-//            //Half Lambert lighting
-//            vec3 diffuse = u_lightColor * albedo * (dot(worldNormal, u_lightDir) * 0.5 + 0.5);
+            // // Half Lambert lighting
+            // vec3 diffuse = u_lightColor * albedo * (dot(worldNormal, u_lightDir) * 0.5 + 0.5);
+
             vec3 specular = u_lightColor * u_specular * pow(max(0.0, dot(worldNormal, halfDir)), u_gloss);
+            if (u_hasMask == 1) {
+                float specularMask = texture2D(u_specularMask, v_texcoord).r * u_specularScale;
+                specular *= specularMask;
+            }
             specular *= smoothstep(0.0, 0.12, dot(normal, lightDir));
+
             gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
         }
     </script>

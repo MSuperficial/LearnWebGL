@@ -18,17 +18,24 @@ function main() {
     let tangent_AL = gl.getAttribLocation(program, "a_tangent");
 
     let viewWorldPos_UL = gl.getUniformLocation(program, "u_viewWorldPos");
+    let lightDir_UL = gl.getUniformLocation(program, "u_lightDir");
+    let lightColor_UL = gl.getUniformLocation(program, "u_lightColor");
+
     let mat_W_UL = gl.getUniformLocation(program, "u_Mat_W");
     let mat_W_IT_UL = gl.getUniformLocation(program, "u_Mat_W_IT");
     let mat_WVP_UL = gl.getUniformLocation(program, "u_Mat_WVP");
+
     let mainTex_UL = gl.getUniformLocation(program, "u_mainTex");
-    let bumpMap_UL = gl.getUniformLocation(program, "u_bumpMap");
     let ambient_UL = gl.getUniformLocation(program, "u_ambient");
-    let lightDir_UL = gl.getUniformLocation(program, "u_lightDir");
-    let lightColor_UL = gl.getUniformLocation(program, "u_lightColor");
     let specular_UL = gl.getUniformLocation(program, "u_specular");
     let gloss_UL = gl.getUniformLocation(program, "u_gloss");
+
+    let bumpMap_UL = gl.getUniformLocation(program, "u_bumpMap");
     let bumpScale_UL = gl.getUniformLocation(program, "u_bumpScale");
+
+    let specularMask_UL = gl.getUniformLocation(program, "u_specularMask");
+    let specularScale_UL = gl.getUniformLocation(program, "u_specularScale");
+    let hasMask_UL = gl.getUniformLocation(program, "u_hasMask");
 
     gl.enableVertexAttribArray(position_AL);
     gl.enableVertexAttribArray(texcoord_AL);
@@ -73,6 +80,8 @@ function main() {
     setTexture(ground_texture, 2, "Resources/Road_Diffuse.jpg", gl.NEAREST_MIPMAP_LINEAR);
     let ground_normalTex = gl.createTexture();
     setTexture(ground_normalTex, 3, "Resources/Road_Normal.jpg", gl.NEAREST_MIPMAP_LINEAR);
+    let ground_specularMask = gl.createTexture();
+    setTexture(ground_specularMask, 4, "Resources/Road_Specular.jpg", gl.NEAREST_MIPMAP_LINEAR);
 
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
     //摄像机属性
@@ -101,9 +110,11 @@ function main() {
         color: [1, 1, 1],
     };
 
-    let specular = [0.95, 0.75, 0.60];
+    let specularColor = [0.95, 0.75, 0.60];
     let gloss = 300.0;
-    let bumpScale = 1.0;
+    let wallBumpScale = 1.0;
+    let groundBumpScale = 0.05;
+    let groundSpecularScale = 0.1;
 
     //监听键盘和鼠标输入
     let keyPressed = {
@@ -237,14 +248,17 @@ function main() {
         gl.uniform3fv(lightDir_UL, m4.subtractVectors([0, 0, 0], directionalLight.direction));
         gl.uniform3fv(lightColor_UL, directionalLight.color);
         gl.uniform3fv(viewWorldPos_UL, camera.position);
-        gl.uniform3fv(specular_UL, specular);
+        gl.uniform3fv(specular_UL, specularColor);
         gl.uniform1f(gloss_UL, gloss);
-        gl.uniform1f(bumpScale_UL, bumpScale);
 
         //绘制迷宫
         //墙壁
         gl.bindBuffer(gl.ARRAY_BUFFER, wallTexcoordBuffer);
         gl.vertexAttribPointer(texcoord_AL, 2, gl.FLOAT, false, 0, 0);
+        gl.uniform1i(mainTex_UL, 0);
+        gl.uniform1i(bumpMap_UL, 1);
+        gl.uniform1i(hasMask_UL, 0);
+        gl.uniform1f(bumpScale_UL, wallBumpScale);
         for (let i = 0; i < mazeSize; i++) {
             for (let j = 0; j < mazeSize; j++) {
                 if(!maze[i][j]) {
@@ -256,8 +270,6 @@ function main() {
                     gl.uniformMatrix4fv(mat_W_UL, false, mat_world);
                     gl.uniformMatrix4fv(mat_W_IT_UL, false, mat_world_IT);
                     gl.uniformMatrix4fv(mat_WVP_UL, false, mat_worldViewProjection);
-                    gl.uniform1i(mainTex_UL, 0);
-                    gl.uniform1i(bumpMap_UL, 1);
 
                     gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
                 }
@@ -276,6 +288,10 @@ function main() {
         gl.uniformMatrix4fv(mat_WVP_UL, false, mat_worldViewProjection);
         gl.uniform1i(mainTex_UL, 2);
         gl.uniform1i(bumpMap_UL, 3);
+        gl.uniform1i(specularMask_UL, 4);
+        gl.uniform1f(bumpScale_UL, groundBumpScale);
+        gl.uniform1f(specularScale_UL, groundSpecularScale);
+        gl.uniform1i(hasMask_UL, 1);
         gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
 
         requestAnimationFrame(drawScene);
