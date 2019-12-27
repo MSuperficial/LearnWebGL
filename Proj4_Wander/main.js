@@ -101,7 +101,7 @@ function main() {
         color: [1, 1, 1],
     };
 
-    let specular = [0.89, 0.75, 0.70];
+    let specular = [0.95, 0.75, 0.60];
     let gloss = 300.0;
     let bumpScale = 1.0;
 

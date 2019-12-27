@@ -31,6 +31,7 @@
         uniform mat4 u_Mat_WVP;
 
         varying vec2 v_texcoord;
+        varying vec3 v_normal;
         varying vec3 v_tangent;
         varying vec3 v_viewDir;
         varying mat3 v_Mat_TtoW;
@@ -44,6 +45,7 @@
             gl_Position = u_Mat_WVP * a_position;
 
             v_texcoord = a_texcoord;
+            v_normal = worldNormal;
             v_viewDir = u_viewWorldPos - worldPos;
             v_Mat_TtoW = mat3(worldTangent, worldBinormal, worldNormal);
         }
@@ -62,11 +64,13 @@
         uniform float u_bumpScale;
 
         varying vec2 v_texcoord;
+        varying vec3 v_normal;
         varying vec3 v_tangent;
         varying vec3 v_viewDir;
         varying mat3 v_Mat_TtoW;
 
         void main() {
+            vec3 normal = normalize(v_normal);
             vec3 lightDir = normalize(u_lightDir);
             vec3 viewDir = normalize(v_viewDir);
             vec3 halfDir = normalize(lightDir + viewDir);
@@ -83,6 +87,7 @@
 //            //Half Lambert lighting
 //            vec3 diffuse = u_lightColor * albedo * (dot(worldNormal, u_lightDir) * 0.5 + 0.5);
             vec3 specular = u_lightColor * u_specular * pow(max(0.0, dot(worldNormal, halfDir)), u_gloss);
+            specular *= smoothstep(0.0, 0.12, dot(normal, lightDir));
             gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
         }
     </script>
