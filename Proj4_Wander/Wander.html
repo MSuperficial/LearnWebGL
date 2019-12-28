@@ -12,105 +12,162 @@
             border-right: 5px solid grey;
             border-bottom: 5px solid grey;
         }
+        #uiContainer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3;
+            font-family: monospace;
+            pointer-events: none;
+            text-shadow:
+                    -1px -1px 0 #FFF,
+                    1px -1px 0 #FFF,
+                    -1px 1px 0 #FFF,
+                    1px 1px 0 #FFF;
+        }
+        #ui {
+            opacity: 0.8;
+        }
+        #ui>div {
+            pointer-events: none;
+        }
+        #ui input, #ui select, #ui option, #ui canvas {
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body onload="main()">
-    <canvas id="canvas" width="800" height="600"></canvas>
-    <button id="full-screen-button">推荐全屏模式</button>
+<canvas id="canvas" width="800" height="600"></canvas>
+<div id="uiContainer">
+    <div id="ui">
+        <div id="gloss"></div>
+        <div id="wallBumpScale"></div>
+        <div id="groundBumpScale"></div>
+        <div id="groundSpecularScale"></div>
+        <div id="ambientIntensity"></div>
+        <div id="light_around"></div>
+        <div id="light_height"></div>
+    </div>
+</div>
+<button id="full-screen-button">推荐全屏模式</button>
 
-    <!-- vertex shader -->
-    <script  id="3d-vertex-shader" type="x-shader/x-vertex">
-        attribute vec4 a_position;
-        attribute vec2 a_texcoord;
-        attribute vec3 a_normal;
-        attribute vec3 a_tangent;
+<!-- vertex shader -->
+<script  id="3d-vertex-shader" type="x-shader/x-vertex">
+    attribute vec4 a_position;
+    attribute vec2 a_texcoord;
+    attribute vec3 a_normal;
+    attribute vec3 a_tangent;
 
-        uniform vec3 u_viewWorldPos;
-        uniform mat4 u_Mat_W;
-        uniform mat4 u_Mat_W_IT;
-        uniform mat4 u_Mat_WVP;
+    uniform vec3 u_viewWorldPos;
+    uniform mat4 u_Mat_W;
+    uniform mat4 u_Mat_W_IT;
+    uniform mat4 u_Mat_WVP;
 
-        varying vec2 v_texcoord;
-        varying vec3 v_normal;
-        varying vec3 v_tangent;
-        varying vec3 v_viewDir;
-        varying mat3 v_Mat_TtoW;
+    varying vec2 v_texcoord;
+    varying vec3 v_normal;
+    varying vec3 v_tangent;
+    varying vec3 v_viewDir;
+    varying mat3 v_Mat_TtoW;
 
-        void main() {
-            vec3 worldPos = (u_Mat_W * a_position).xyz;
-            vec3 worldNormal = mat3(u_Mat_W_IT) * a_normal;
-            vec3 worldTangent = mat3(u_Mat_W) * a_tangent;
-            vec3 worldBinormal = cross(worldNormal, worldTangent);
+    void main() {
+        vec3 worldPos = (u_Mat_W * a_position).xyz;
+        vec3 worldNormal = mat3(u_Mat_W_IT) * a_normal;
+        vec3 worldTangent = mat3(u_Mat_W) * a_tangent;
+        vec3 worldBinormal = cross(worldNormal, worldTangent);
 
-            gl_Position = u_Mat_WVP * a_position;
+        gl_Position = u_Mat_WVP * a_position;
 
-            v_texcoord = a_texcoord;
-            v_normal = worldNormal;
-            v_viewDir = u_viewWorldPos - worldPos;
-            v_Mat_TtoW = mat3(worldTangent, worldBinormal, worldNormal);
+        v_texcoord = a_texcoord;
+        v_normal = worldNormal;
+        v_viewDir = u_viewWorldPos - worldPos;
+        v_Mat_TtoW = mat3(worldTangent, worldBinormal, worldNormal);
+    }
+</script>
+<!-- fragment shader -->
+<script  id="3d-fragment-shader" type="x-shader/x-fragment">
+    precision mediump float;
+
+    uniform sampler2D u_mainTex;
+
+    uniform sampler2D u_bumpMap;
+    uniform float u_bumpScale;
+
+    uniform sampler2D u_specularMask;
+    uniform float u_specularScale;
+    uniform int u_hasMask;
+
+    uniform vec3 u_lightDir;
+    uniform vec3 u_lightColor;
+    uniform vec3 u_ambient;
+    uniform vec3 u_specular;
+    uniform float u_gloss;
+
+    varying vec2 v_texcoord;
+    varying vec3 v_normal;
+    varying vec3 v_tangent;
+    varying vec3 v_viewDir;
+    varying mat3 v_Mat_TtoW;
+
+    void main() {
+        vec3 normal = normalize(v_normal);
+        vec3 lightDir = normalize(u_lightDir);
+        vec3 viewDir = normalize(v_viewDir);
+        vec3 halfDir = normalize(lightDir + viewDir);
+
+        vec3 bump = texture2D(u_bumpMap, v_texcoord).rgb;
+        bump.xy = (bump.xy * 2.0 - 1.0) * u_bumpScale;
+        bump.z = sqrt(1.0 - dot(bump.xy, bump.xy));
+        vec3 worldNormal = v_Mat_TtoW * bump;
+
+        vec3 albedo = texture2D(u_mainTex, v_texcoord).rgb;
+
+        vec3 ambient = albedo * u_ambient;
+
+        // Lambert lighting
+        vec3 diffuse = u_lightColor * albedo * max(0.0, dot(worldNormal, lightDir));
+        // // Half Lambert lighting
+        // vec3 diffuse = u_lightColor * albedo * (dot(worldNormal, u_lightDir) * 0.5 + 0.5);
+
+        vec3 specular = u_lightColor * u_specular * pow(max(0.0, dot(worldNormal, halfDir)), u_gloss);
+        if (u_hasMask == 1) {
+            float specularMask = texture2D(u_specularMask, v_texcoord).r * u_specularScale;
+            specular *= specularMask;
         }
-    </script>
-    <!-- fragment shader -->
-    <script  id="3d-fragment-shader" type="x-shader/x-fragment">
-        precision mediump float;
+        specular *= smoothstep(0.0, 0.12, dot(normal, lightDir));
 
-        uniform sampler2D u_mainTex;
+        gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
+    }
+</script>
 
-        uniform sampler2D u_bumpMap;
-        uniform float u_bumpScale;
+<!-- vertex shader -->
+<script  id="skybox-vertex-shader" type="x-shader/x-vertex">
+    attribute vec4 a_sky_position;
+    varying vec4 v_sky_position;
+    void main() {
+        v_sky_position = a_sky_position;
+        gl_Position = a_sky_position;
+    }
+</script>
+<!-- fragment shader -->
+<script  id="skybox-fragment-shader" type="x-shader/x-fragment">
+    precision mediump float;
 
-        uniform sampler2D u_specularMask;
-        uniform float u_specularScale;
-        uniform int u_hasMask;
+    uniform samplerCube u_skybox;
+    uniform mat4 u_Mat_VP_I;
 
-        uniform vec3 u_lightDir;
-        uniform vec3 u_lightColor;
-        uniform vec3 u_ambient;
-        uniform vec3 u_specular;
-        uniform float u_gloss;
+    varying vec4 v_sky_position;
+    void main() {
+        vec4 t = u_Mat_VP_I * v_sky_position;
+        gl_FragColor = textureCube(u_skybox, normalize(t.xyz / t.w));
+    }
+</script>
 
-        varying vec2 v_texcoord;
-        varying vec3 v_normal;
-        varying vec3 v_tangent;
-        varying vec3 v_viewDir;
-        varying mat3 v_Mat_TtoW;
-
-        void main() {
-            vec3 normal = normalize(v_normal);
-            vec3 lightDir = normalize(u_lightDir);
-            vec3 viewDir = normalize(v_viewDir);
-            vec3 halfDir = normalize(lightDir + viewDir);
-
-            vec3 bump = texture2D(u_bumpMap, v_texcoord).rgb;
-            bump.xy = (bump.xy * 2.0 - 1.0) * u_bumpScale;
-            bump.z = sqrt(1.0 - dot(bump.xy, bump.xy));
-            vec3 worldNormal = v_Mat_TtoW * bump;
-
-            vec3 albedo = texture2D(u_mainTex, v_texcoord).rgb;
-
-            vec3 ambient = albedo * u_ambient;
-
-            // Lambert lighting
-            vec3 diffuse = u_lightColor * albedo * max(0.0, dot(worldNormal, lightDir));
-            // // Half Lambert lighting
-            // vec3 diffuse = u_lightColor * albedo * (dot(worldNormal, u_lightDir) * 0.5 + 0.5);
-
-            vec3 specular = u_lightColor * u_specular * pow(max(0.0, dot(worldNormal, halfDir)), u_gloss);
-            if (u_hasMask == 1) {
-                float specularMask = texture2D(u_specularMask, v_texcoord).r * u_specularScale;
-                specular *= specularMask;
-            }
-            specular *= smoothstep(0.0, 0.12, dot(normal, lightDir));
-
-            gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
-        }
-    </script>
-
-    <script src="../lib/webgl-utils.js"></script>
-    <script src="../lib/webgl-lessons-ui.js"></script>
-    <script src="../lib/m3.js"></script>
-    <script src="../lib/m4.js"></script>
-    <script src="maze.js"></script>
-    <script src="main.js"></script>
+<script src="lib/webgl-utils.js"></script>
+<script src="lib/webgl-lessons-ui.js"></script>
+<script src="lib/m3.js"></script>
+<script src="lib/m4.js"></script>
+<script src="lib/primitives.js"></script>
+<script src="maze.js"></script>
+<script src="main.js"></script>
 </body>
 </html>

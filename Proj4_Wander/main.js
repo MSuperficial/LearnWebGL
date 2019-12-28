@@ -7,46 +7,55 @@ function main() {
         return;
     }
 
-    let program = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
-    gl.useProgram(program);
+    let glProgram = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
+    // let skyboxProgram = webglUtils.createProgramFromScripts(gl, ["skybox-vertex-shader", "skybox-fragment-shader"]);
+    const skyboxProgramInfo = webglUtils.createProgramInfo(gl, ["skybox-vertex-shader", "skybox-fragment-shader"]);
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
 
-    let position_AL = gl.getAttribLocation(program, "a_position");
-    let texcoord_AL = gl.getAttribLocation(program, "a_texcoord");
-    let normal_AL = gl.getAttribLocation(program, "a_normal");
-    let tangent_AL = gl.getAttribLocation(program, "a_tangent");
+    gl.useProgram(glProgram);
+    let position_AL = gl.getAttribLocation(glProgram, "a_position");
+    let texcoord_AL = gl.getAttribLocation(glProgram, "a_texcoord");
+    let normal_AL = gl.getAttribLocation(glProgram, "a_normal");
+    let tangent_AL = gl.getAttribLocation(glProgram, "a_tangent");
 
-    let viewWorldPos_UL = gl.getUniformLocation(program, "u_viewWorldPos");
-    let lightDir_UL = gl.getUniformLocation(program, "u_lightDir");
-    let lightColor_UL = gl.getUniformLocation(program, "u_lightColor");
+    let viewWorldPos_UL = gl.getUniformLocation(glProgram, "u_viewWorldPos");
+    let lightDir_UL = gl.getUniformLocation(glProgram, "u_lightDir");
+    let lightColor_UL = gl.getUniformLocation(glProgram, "u_lightColor");
 
-    let mat_W_UL = gl.getUniformLocation(program, "u_Mat_W");
-    let mat_W_IT_UL = gl.getUniformLocation(program, "u_Mat_W_IT");
-    let mat_WVP_UL = gl.getUniformLocation(program, "u_Mat_WVP");
+    let mat_W_UL = gl.getUniformLocation(glProgram, "u_Mat_W");
+    let mat_W_IT_UL = gl.getUniformLocation(glProgram, "u_Mat_W_IT");
+    let mat_WVP_UL = gl.getUniformLocation(glProgram, "u_Mat_WVP");
 
-    let mainTex_UL = gl.getUniformLocation(program, "u_mainTex");
-    let ambient_UL = gl.getUniformLocation(program, "u_ambient");
-    let specular_UL = gl.getUniformLocation(program, "u_specular");
-    let gloss_UL = gl.getUniformLocation(program, "u_gloss");
+    let mainTex_UL = gl.getUniformLocation(glProgram, "u_mainTex");
+    let ambient_UL = gl.getUniformLocation(glProgram, "u_ambient");
+    let specular_UL = gl.getUniformLocation(glProgram, "u_specular");
+    let gloss_UL = gl.getUniformLocation(glProgram, "u_gloss");
 
-    let bumpMap_UL = gl.getUniformLocation(program, "u_bumpMap");
-    let bumpScale_UL = gl.getUniformLocation(program, "u_bumpScale");
+    let bumpMap_UL = gl.getUniformLocation(glProgram, "u_bumpMap");
+    let bumpScale_UL = gl.getUniformLocation(glProgram, "u_bumpScale");
 
-    let specularMask_UL = gl.getUniformLocation(program, "u_specularMask");
-    let specularScale_UL = gl.getUniformLocation(program, "u_specularScale");
-    let hasMask_UL = gl.getUniformLocation(program, "u_hasMask");
+    let specularMask_UL = gl.getUniformLocation(glProgram, "u_specularMask");
+    let specularScale_UL = gl.getUniformLocation(glProgram, "u_specularScale");
+    let hasMask_UL = gl.getUniformLocation(glProgram, "u_hasMask");
 
     gl.enableVertexAttribArray(position_AL);
     gl.enableVertexAttribArray(texcoord_AL);
     gl.enableVertexAttribArray(normal_AL);
     gl.enableVertexAttribArray(tangent_AL);
 
+    // gl.useProgram(skyboxProgram);
+    // let sky_position_AL = gl.getAttribLocation(skyboxProgram, "a_position");
+    // let skybox_UL = gl.getUniformLocation(skyboxProgram, "u_skybox");
+    // let mat_VP_I_UL = gl.getUniformLocation(skyboxProgram, "u_Mat_VP_I");
+    // gl.enableVertexAttribArray(sky_position_AL);
+
     //迷宫属性
     let blockLength = 100;
     let mazeSize = 21;
     let maze = createMaze(mazeSize);
 
+    gl.useProgram(glProgram);
     //迷宫网格数据
     let positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -83,6 +92,63 @@ function main() {
     let ground_specularMask = gl.createTexture();
     setTexture(ground_specularMask, 4, "Resources/Road_Specular.jpg", gl.NEAREST_MIPMAP_LINEAR);
 
+    gl.useProgram(skyboxProgramInfo.program);
+    // let sky_positionBuffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ARRAY_BUFFER, sky_positionBuffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    //     -1, -1,
+    //      1, -1,
+    //     -1,  1
+    //     -1,  1,
+    //      1, -1,
+    //      1,  1,
+    // ]), gl.STATIC_DRAW);
+    let quadBufferInfo = primitives.createXYQuadBufferInfo(gl);
+
+    let skyboxTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, skyboxTexture);
+
+    const faceInfos = [
+        {
+            target: gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+            src: "Resources/skybox/right.jpg",
+        },
+        {
+            target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+            src: "Resources/skybox/left.jpg",
+        },
+        {
+            target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+            src: "Resources/skybox/top.jpg",
+        },
+        {
+            target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+            src: "Resources/skybox/bottom.jpg",
+        },
+        {
+            target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
+            src: "Resources/skybox/front.jpg",
+        },
+        {
+            target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+            src: "Resources/skybox/back.jpg",
+        },
+    ];
+    faceInfos.forEach((faceInfo) => {
+        let {target, src} = faceInfo;
+        gl.texImage2D(target, 0, gl.RGBA, 2048, 2048, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        let image = new Image();
+        image.src = src;
+        image.addEventListener("load", function () {
+            gl.useProgram(skyboxProgramInfo.program);
+            gl.bindTexture(gl.TEXTURE_CUBE_MAP, skyboxTexture);
+            gl.texImage2D(target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+            gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+        });
+    });
+    gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
     //摄像机属性
     let camera = {
@@ -108,11 +174,13 @@ function main() {
     let directionalLight = {
         direction: [-1, -1, -1],
         color: [1, 1, 1],
+        around: 225,
+        height: 45,
     };
 
     let specularColor = [0.95, 0.75, 0.60];
-    let gloss = 300.0;
-    let wallBumpScale = 1.0;
+    let gloss = 250.0;
+    let wallBumpScale = -0.8;
     let groundBumpScale = 0.05;
     let groundSpecularScale = 0.1;
 
@@ -184,6 +252,41 @@ function main() {
         camera.rotateSpeed = [e.movementY * speedRatio, -e.movementX * speedRatio];
     });
 
+    webglLessonsUI.setupSlider("#gloss", {value: gloss, slide: function (e, ui) {
+            gloss = ui.value;
+        }, min: 8.0, max: 300.0, step: 0.01, precision: 2});
+    webglLessonsUI.setupSlider("#wallBumpScale", {value: wallBumpScale, slide: function (e, ui) {
+            wallBumpScale = ui.value;
+        }, min: -1.0, max: 1.0, step: 0.001, precision: 3});
+    webglLessonsUI.setupSlider("#groundBumpScale", {value: groundBumpScale, slide: function (e, ui) {
+            groundBumpScale = ui.value;
+        }, min: 0.0, max: 0.3, step: 0.001, precision: 3});
+    webglLessonsUI.setupSlider("#groundSpecularScale", {value: groundSpecularScale, slide: function (e, ui) {
+            groundSpecularScale = ui.value;
+        }, min: 0.0, max: 5.0, step: 0.01, precision: 2});
+    webglLessonsUI.setupSlider("#ambientIntensity", {value: ambient.intensity, slide: function (e, ui) {
+            ambient.intensity = ui.value;
+        }, min: 0.0, max: 4.0, step: 0.01, precision: 2});
+    webglLessonsUI.setupSlider("#light_around", {value: directionalLight.around, slide: function (e, ui) {
+            directionalLight.around = ui.value;
+            setLightDir();
+        }, min: 0, max: 360});
+    webglLessonsUI.setupSlider("#light_height", {value: directionalLight.height, slide: function (e, ui) {
+            directionalLight.height = ui.value;
+            setLightDir();
+        }, min: 0, max: 90});
+
+    function setLightDir() {
+        let origin = [0, 0, 1];
+        let up = [0, 1, 0];
+        let left = [1, 0, 0];
+        let matrix = m4.axisRotation(up, m3.degToRad(directionalLight.around));
+        left = m4.normalize(m4.transformDirection(matrix, left));
+        matrix = m4.axisRotation(left, m3.degToRad(directionalLight.height));
+        matrix = m4.axisRotate(matrix, up, m3.degToRad(directionalLight.around));
+        directionalLight.direction = m4.normalize(m4.transformDirection(matrix, origin));
+    }
+
     //设置全屏并锁定鼠标指针
     let btn = document.getElementById("full-screen-button");
     function lockPointer() {
@@ -237,6 +340,7 @@ function main() {
         let mat_view = m4.inverse(mat_camera);
         let mat_viewProjection = m4.multiply(mat_projection, mat_view);
 
+        gl.useProgram(glProgram);
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
         gl.vertexAttribPointer(position_AL, 3, gl.FLOAT, false, 0, 0);
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
@@ -293,6 +397,26 @@ function main() {
         gl.uniform1f(specularScale_UL, groundSpecularScale);
         gl.uniform1i(hasMask_UL, 1);
         gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
+
+        gl.useProgram(skyboxProgramInfo.program);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, sky_positionBuffer);
+        // gl.vertexAttribPointer(sky_position_AL, 2, gl.FLOAT, false, 0, 0);
+
+        let sky_mat_view = m4.copy(mat_view);
+        sky_mat_view[12] = 0;
+        sky_mat_view[13] = 0;
+        sky_mat_view[14] = 0;
+        let sky_mat_viewProjection = m4.multiply(mat_projection, sky_mat_view);
+        let sky_mat_VP_I = m4.inverse(sky_mat_viewProjection);
+        // gl.uniformMatrix4fv(mat_VP_I_UL, false, sky_mat_VP_I);
+        // gl.uniform1i(skybox_UL, 0);
+        // gl.drawArrays(gl.TRIANGLES, 0, 1 * 6);
+        webglUtils.setBuffersAndAttributes(gl, skyboxProgramInfo, quadBufferInfo);
+        webglUtils.setUniforms(skyboxProgramInfo, {
+            u_Mat_VP_I: sky_mat_VP_I,
+            u_skybox: skyboxTexture,
+        });
+        webglUtils.drawBufferInfo(gl, quadBufferInfo);
 
         requestAnimationFrame(drawScene);
     }
@@ -351,6 +475,7 @@ function main() {
         let image = new Image();
         image.src = imagePath;
         image.addEventListener("load", function () {
+            gl.useProgram(glProgram);
             gl.activeTexture(gl.TEXTURE0 + textureIndex);
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
