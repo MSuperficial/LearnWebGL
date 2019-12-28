@@ -47,6 +47,7 @@
         <div id="ambientIntensity"></div>
         <div id="light_around"></div>
         <div id="light_height"></div>
+        <div id="moveSpeed"></div>
     </div>
 </div>
 <button id="full-screen-button">推荐全屏模式</button>
@@ -146,6 +147,7 @@
     void main() {
         v_sky_position = a_sky_position;
         gl_Position = a_sky_position;
+        gl_Position.z = 1.0;
     }
 </script>
 <!-- fragment shader -->

@@ -8,8 +8,7 @@ function main() {
     }
 
     let glProgram = webglUtils.createProgramFromScripts(gl, ["3d-vertex-shader", "3d-fragment-shader"]);
-    // let skyboxProgram = webglUtils.createProgramFromScripts(gl, ["skybox-vertex-shader", "skybox-fragment-shader"]);
-    const skyboxProgramInfo = webglUtils.createProgramInfo(gl, ["skybox-vertex-shader", "skybox-fragment-shader"]);
+    let skyboxProgram = webglUtils.createProgramFromScripts(gl, ["skybox-vertex-shader", "skybox-fragment-shader"]);
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
 
@@ -44,11 +43,11 @@ function main() {
     gl.enableVertexAttribArray(normal_AL);
     gl.enableVertexAttribArray(tangent_AL);
 
-    // gl.useProgram(skyboxProgram);
-    // let sky_position_AL = gl.getAttribLocation(skyboxProgram, "a_position");
-    // let skybox_UL = gl.getUniformLocation(skyboxProgram, "u_skybox");
-    // let mat_VP_I_UL = gl.getUniformLocation(skyboxProgram, "u_Mat_VP_I");
-    // gl.enableVertexAttribArray(sky_position_AL);
+    gl.useProgram(skyboxProgram);
+    let sky_position_AL = gl.getAttribLocation(skyboxProgram, "a_sky_position");
+    let skybox_UL = gl.getUniformLocation(skyboxProgram, "u_skybox");
+    let mat_VP_I_UL = gl.getUniformLocation(skyboxProgram, "u_Mat_VP_I");
+    gl.enableVertexAttribArray(sky_position_AL);
 
     //迷宫属性
     let blockLength = 100;
@@ -92,20 +91,20 @@ function main() {
     let ground_specularMask = gl.createTexture();
     setTexture(ground_specularMask, 4, "Resources/Road_Specular.jpg", gl.NEAREST_MIPMAP_LINEAR);
 
-    gl.useProgram(skyboxProgramInfo.program);
-    // let sky_positionBuffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, sky_positionBuffer);
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    //     -1, -1,
-    //      1, -1,
-    //     -1,  1
-    //     -1,  1,
-    //      1, -1,
-    //      1,  1,
-    // ]), gl.STATIC_DRAW);
-    let quadBufferInfo = primitives.createXYQuadBufferInfo(gl);
+    gl.useProgram(skyboxProgram);
+    let sky_positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, sky_positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1, -1,
+        1, -1,
+        -1,  1,
+        -1,  1,
+        1, -1,
+        1,  1,
+    ]), gl.STATIC_DRAW);
 
     let skyboxTexture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, skyboxTexture);
 
     const faceInfos = [
@@ -136,11 +135,13 @@ function main() {
     ];
     faceInfos.forEach((faceInfo) => {
         let {target, src} = faceInfo;
-        gl.texImage2D(target, 0, gl.RGBA, 2048, 2048, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.texImage2D(target, 0, gl.RGBA, 1, 1, 0, gl.RGBA,
+                      gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 255, 255]));
         let image = new Image();
         image.src = src;
         image.addEventListener("load", function () {
-            gl.useProgram(skyboxProgramInfo.program);
+            gl.useProgram(skyboxProgram);
+            gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_CUBE_MAP, skyboxTexture);
             gl.texImage2D(target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
             gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
@@ -247,7 +248,6 @@ function main() {
         }
     });
     gl.canvas.addEventListener("mousemove", function (e) {
-        // console.log([e.movementX, e.movementY]);
         let speedRatio = 20;
         camera.rotateSpeed = [e.movementY * speedRatio, -e.movementX * speedRatio];
     });
@@ -275,7 +275,9 @@ function main() {
             directionalLight.height = ui.value;
             setLightDir();
         }, min: 0, max: 90});
-
+    webglLessonsUI.setupSlider("#moveSpeed", {value: camera.moveSpeed, slide: function (e, ui) {
+            camera.moveSpeed = ui.value;
+        }, min: 50, max: 500});
     function setLightDir() {
         let origin = [0, 0, 1];
         let up = [0, 1, 0];
@@ -311,7 +313,7 @@ function main() {
     }
     document.addEventListener('fullscreenchange', fullscreenChange, false);
     function pointerLockError() {
-        console.log("锁定指针时出错。");
+        alert("锁定指针时出错。");
     }
     document.addEventListener('pointerlockerror', pointerLockError, false);
 
@@ -323,12 +325,13 @@ function main() {
         let deltaTime = now - lastFrameTime;
         lastFrameTime = now;
 
+        gl.enable(gl.CULL_FACE);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+
         webglUtils.resizeCanvasToDisplaySize(gl.canvas);
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        gl.enable(gl.CULL_FACE);
-        gl.enable(gl.DEPTH_TEST);
 
         //摄像头漫游
         cameraMove(deltaTime);
@@ -398,9 +401,10 @@ function main() {
         gl.uniform1i(hasMask_UL, 1);
         gl.drawArrays(gl.TRIANGLES, 0, 6 * 6);
 
-        gl.useProgram(skyboxProgramInfo.program);
-        // gl.bindBuffer(gl.ARRAY_BUFFER, sky_positionBuffer);
-        // gl.vertexAttribPointer(sky_position_AL, 2, gl.FLOAT, false, 0, 0);
+        gl.useProgram(skyboxProgram);
+        gl.enableVertexAttribArray(sky_position_AL);
+        gl.bindBuffer(gl.ARRAY_BUFFER, sky_positionBuffer);
+        gl.vertexAttribPointer(sky_position_AL, 2, gl.FLOAT, false, 0, 0);
 
         let sky_mat_view = m4.copy(mat_view);
         sky_mat_view[12] = 0;
@@ -408,15 +412,9 @@ function main() {
         sky_mat_view[14] = 0;
         let sky_mat_viewProjection = m4.multiply(mat_projection, sky_mat_view);
         let sky_mat_VP_I = m4.inverse(sky_mat_viewProjection);
-        // gl.uniformMatrix4fv(mat_VP_I_UL, false, sky_mat_VP_I);
-        // gl.uniform1i(skybox_UL, 0);
-        // gl.drawArrays(gl.TRIANGLES, 0, 1 * 6);
-        webglUtils.setBuffersAndAttributes(gl, skyboxProgramInfo, quadBufferInfo);
-        webglUtils.setUniforms(skyboxProgramInfo, {
-            u_Mat_VP_I: sky_mat_VP_I,
-            u_skybox: skyboxTexture,
-        });
-        webglUtils.drawBufferInfo(gl, quadBufferInfo);
+        gl.uniformMatrix4fv(mat_VP_I_UL, false, sky_mat_VP_I);
+        gl.uniform1i(skybox_UL, 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 6 * 1);
 
         requestAnimationFrame(drawScene);
     }
@@ -448,11 +446,9 @@ function main() {
 
         let rot = camera.rotation;
         rot = m4.addVectors(rot, degOffset);
-        // console.log("pre:" + rot);
         rot[0] = m3.clamp(rot[0], camera.maxDownDeg, camera.maxUpDeg);
         rot[1] = rot[1] < 0 ? (rot[1] + 360) : rot[1];
         rot[1] %= 361;
-        // console.log("post:" + rot);
 
         let up = [0, 1, 0];
         let matrix = m4.axisRotation(up, m3.degToRad(rot[1]));
