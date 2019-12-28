@@ -2,17 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d1edc485-a5e3-422b-bdde-581c934a1d47" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/WDZ.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/WDZ.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proj4_Wander/Resources/Road_Diffuse.tga" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proj4_Wander/Resources/Road_Normal.tga" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proj4_Wander/Resources/Road_Specular.tga" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proj4_Wander/Resources/Wall_Diffuse.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proj4_Wander/Resources/Wall_Diffuse.tga" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proj4_Wander/Resources/Wall_Normal.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proj4_Wander/Resources/Wall_Normal.tga" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Proj4_Wander/Wander.html" beforeDir="false" afterPath="$PROJECT_DIR$/Proj4_Wander/Wander.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proj4_Wander/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/Proj4_Wander/main.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +125,7 @@
       <workItem from="1577414984745" duration="8127000" />
       <workItem from="1577425838516" duration="11313000" />
       <workItem from="1577441507271" duration="16291000" />
-      <workItem from="1577511592652" duration="1517000" />
+      <workItem from="1577511592652" duration="1667000" />
     </task>
     <task id="LOCAL-00001" summary="feat: draw a simple square with clicking">
       <created>1574963456806</created>
@@ -199,7 +190,14 @@
       <option name="project" value="LOCAL" />
       <updated>1577447686065</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="feat: add UI and skybox">
+      <created>1577513168658</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1577513168658</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -232,7 +230,9 @@
     <MESSAGE value="feat: add light and normal map" />
     <MESSAGE value="fix: fix specular bug" />
     <MESSAGE value="feat: add specular mask" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add specular mask" />
+    <MESSAGE value="feat: add UI and skybox" />
+    <MESSAGE value="fix: fix binormal direction" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: fix binormal direction" />
   </component>
   <component name="WindowStateProjectService">
     <state x="380" y="71" key="#Deployment" timestamp="1574963077976">
@@ -247,10 +247,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="361" y="71" key="#Notifications/0.0.1536.824@0.0.1536.824" timestamp="1576219859877" />
-    <state x="200" y="0" width="835" height="824" key="CommitChangelistDialog2" timestamp="1577447684740">
+    <state x="200" y="0" width="835" height="824" key="CommitChangelistDialog2" timestamp="1577513260769">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="200" y="0" width="835" height="824" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1577447684740" />
+    <state x="200" y="0" width="835" height="824" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1577513260769" />
     <state x="23" y="67" key="DiffContextDialog" timestamp="1576741620726">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

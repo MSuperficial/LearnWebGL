@@ -73,7 +73,7 @@
         vec3 worldPos = (u_Mat_W * a_position).xyz;
         vec3 worldNormal = mat3(u_Mat_W_IT) * a_normal;
         vec3 worldTangent = mat3(u_Mat_W) * a_tangent;
-        vec3 worldBinormal = cross(worldNormal, worldTangent);
+        vec3 worldBinormal = cross(worldTangent, worldNormal);
 
         gl_Position = u_Mat_WVP * a_position;
 
